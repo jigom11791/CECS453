@@ -9,6 +9,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -20,15 +21,10 @@ private const val TAG = "CrimeListFragment"
 class JGCrimeListFragment : Fragment() {
 
     private lateinit var jgCrimeRecyclerView: RecyclerView
-    private var jgAdapter: JGCrimeAdapter? = null
+    private var jgAdapter: JGCrimeAdapter? = JGCrimeAdapter(emptyList())
 
     private val jgCrimesListViewModel : JGCrimeListViewModel by lazy {
         ViewModelProviders.of(this).get(JGCrimeListViewModel::class.java)
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        Log.d(TAG, "Total crimes: ${jgCrimesListViewModel.jgCrimes.size}")
     }
 
     override fun onCreateView(
@@ -40,13 +36,25 @@ class JGCrimeListFragment : Fragment() {
 
         jgCrimeRecyclerView = jgView.findViewById(R.id.crime_recycler_view) as RecyclerView
         jgCrimeRecyclerView.layoutManager = LinearLayoutManager(context)
+        jgCrimeRecyclerView.adapter = jgAdapter
 
-        jgUpdateUI()
         return jgView
     }
 
-    private fun jgUpdateUI() {
-        val jgCrimes = jgCrimesListViewModel.jgCrimes
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        jgCrimesListViewModel.jgCrimeListLiveData.observe(
+            viewLifecycleOwner,
+            Observer { crimes ->
+                crimes?.let{
+                    Log.i(TAG, "Got crimes ${crimes.size}")
+                    jgUpdateUI(crimes)
+                }
+            }
+        )
+    }
+
+    private fun jgUpdateUI(jgCrimes: List<Crime>) {
         jgAdapter = JGCrimeAdapter(jgCrimes)
         jgCrimeRecyclerView.adapter = jgAdapter
     }
@@ -54,7 +62,7 @@ class JGCrimeListFragment : Fragment() {
     private inner class JGCrimeHolder(view: View)
         : RecyclerView.ViewHolder(view), View.OnClickListener {
 
-        private lateinit var jgCrime: JGCrime
+        private lateinit var jgCrime: Crime
 
         private val jgTitleTextView: TextView = itemView.findViewById(R.id.crime_title)
         private val jgDateTextView: TextView = itemView.findViewById(R.id.crime_date)
@@ -64,11 +72,11 @@ class JGCrimeListFragment : Fragment() {
             itemView.setOnClickListener(this)
         }
 
-        fun bind(jgCrime: JGCrime) {
+        fun bind(jgCrime: Crime) {
             this.jgCrime = jgCrime
-            jgTitleTextView.text = this.jgCrime.jgTitle
-            jgDateTextView.text = this.jgCrime.jgDate.toString()
-            jgSolvedImageView.visibility = if(jgCrime.jgIsSolved) {
+            jgTitleTextView.text = this.jgCrime.title
+            jgDateTextView.text = this.jgCrime.date.toString()
+            jgSolvedImageView.visibility = if(jgCrime.isSolved) {
                 View.VISIBLE
             } else {
                 View.GONE
@@ -76,11 +84,11 @@ class JGCrimeListFragment : Fragment() {
         }
 
         override fun onClick(v: View) {
-            Toast.makeText(context, "${jgCrime.jgTitle} pressed!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "${jgCrime.title} pressed!", Toast.LENGTH_SHORT).show()
         }
     }
 
-    private inner class JGCrimeAdapter(var jgCrimes: List<JGCrime>)
+    private inner class JGCrimeAdapter(var jgCrimes: List<Crime>)
         : RecyclerView.Adapter<JGCrimeHolder>() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): JGCrimeHolder {

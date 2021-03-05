@@ -13,14 +13,14 @@ import androidx.fragment.app.Fragment
 
 class JGCrimeFragment: Fragment() {
 
-    private lateinit var jgCrime: JGCrime
+    private lateinit var jgCrime: Crime
     private lateinit var jgTitleField: EditText
     private lateinit var jgDateButton: Button
     private lateinit var jgSolvedCheckBox: CheckBox
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        jgCrime = JGCrime()
+        jgCrime = Crime()
     }
 
     override fun onCreateView(
@@ -34,7 +34,7 @@ class JGCrimeFragment: Fragment() {
         jgSolvedCheckBox = jgView.findViewById(R.id.jg_crime_solved) as CheckBox
 
         jgDateButton.apply {
-            text = jgCrime.jgDate.toString()
+            text = jgCrime.date.toString()
             isEnabled = false
         }
 
@@ -51,7 +51,7 @@ class JGCrimeFragment: Fragment() {
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                jgCrime.jgTitle = s.toString()
+                jgCrime.title = s.toString()
 
             }
 
@@ -64,7 +64,7 @@ class JGCrimeFragment: Fragment() {
 
         jgSolvedCheckBox.apply {
             setOnCheckedChangeListener { _, isChecked ->
-                jgCrime.jgIsSolved = isChecked
+                jgCrime.isSolved = isChecked
             }
         }
     }
