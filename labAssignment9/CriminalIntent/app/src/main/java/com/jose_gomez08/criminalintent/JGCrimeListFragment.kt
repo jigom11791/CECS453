@@ -1,5 +1,6 @@
 package com.jose_gomez08.criminalintent
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -14,16 +15,30 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import org.w3c.dom.Text
 import java.awt.font.TextAttribute
+import java.util.*
 
 private const val TAG = "CrimeListFragment"
 
 class JGCrimeListFragment : Fragment() {
 
+    /**
+     * Required interface for hosting activites
+     */
+    interface Callbacks {
+        fun jgOnCrimeSelected(crimeId: UUID)
+    }
+
+    private var jgCallbacks: Callbacks? = null
+
     private lateinit var jgCrimeRecyclerView: RecyclerView
     private var jgAdapter: JGCrimeAdapter? = null
-
     private val jgCrimesListViewModel : JGCrimeListViewModel by lazy {
         ViewModelProviders.of(this).get(JGCrimeListViewModel::class.java)
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        jgCallbacks = context as Callbacks?
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
