@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="16dp">
+
+    <TextView
+        style="?android:listSeparatorTextViewStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/jg_crime_title_label"/>
+
+    <EditText
+        android:id="@+id/jg_crime_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/jg_crime_title_hint"/>
+
+    <TextView
+        style="?android:listSeparatorTextViewStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/jg_crime_details_label"/>
+
+    <Button
+        android:id="@+id/jg_crime_date"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:text="Wed Nov 14 11:56 EST 2018"/>
+
+    <CheckBox
+        android:id="@+id/jg_crime_solved"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/jg_crime_solved_label"/>
+
+    <Button
+        android:id="@+id/jg_crime_suspect"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:text="@string/jg_crime_suspect_text" />
+
+    <Button
+        android:id="@+id/jg_crime_report"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:text="@string/jg_crime_report_text" />
+
+</LinearLayout>

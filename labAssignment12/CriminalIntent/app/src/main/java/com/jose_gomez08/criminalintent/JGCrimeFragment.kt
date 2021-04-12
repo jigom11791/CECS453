@@ -1,6 +1,10 @@
 package com.jose_gomez08.criminalintent
 
+import android.app.Activity
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.provider.ContactsContract
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -14,17 +18,23 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import java.util.*
 import androidx.lifecycle.Observer
+import java.lang.String.format
+import android.text.format.DateFormat
 
 private const val TAG = "JGCrimeFragment"
 private const val JG_ARG_CRIME_ID = "jg_crime_id"
 private const val JG_DIALOG_DATE = "DialogDate"
 private const val JG_REQUEST_DATE = 0
+private const val JG_REQUEST_CONTACT = 1
+private const val JG_DATE_FORMAT = "EEE, MMM, dd"
 
 class JGCrimeFragment: Fragment(), JGDatePickerFragment.Callbacks {
 
     private lateinit var jgCrime: Crime
     private lateinit var jgTitleField: EditText
     private lateinit var jgDateButton: Button
+    private lateinit var jgReportButton: Button
+    private lateinit var jgSuspectButton: Button
     private lateinit var jgSolvedCheckBox: CheckBox
     private val  jgCrimeDetailViewModel: JGCrimeDetailViewModel by lazy {
         ViewModelProviders.of(this).get(JGCrimeDetailViewModel::class.java)
@@ -49,6 +59,7 @@ class JGCrimeFragment: Fragment(), JGDatePickerFragment.Callbacks {
         jgTitleField = jgView.findViewById(R.id.jg_crime_title) as EditText
         jgDateButton = jgView.findViewById(R.id.jg_crime_date) as Button
         jgSolvedCheckBox = jgView.findViewById(R.id.jg_crime_solved) as CheckBox
+        jgSuspectButton = jgView.findViewById(R.id.jg_crime_suspect) as Button
 
         return jgView
     }
@@ -90,10 +101,32 @@ class JGCrimeFragment: Fragment(), JGDatePickerFragment.Callbacks {
             }
         }
 
+        jgSuspectButton.apply {
+            val jgPickContactIntent =
+                    Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI)
+            setOnClickListener {
+                startActivityForResult(jgPickContactIntent, JG_REQUEST_CONTACT)
+            }
+        }
+
         jgDateButton.setOnClickListener {
             JGDatePickerFragment.jgNewInstance(jgCrime.date).apply {
                 setTargetFragment(this@JGCrimeFragment, JG_REQUEST_DATE)
                 show(this@JGCrimeFragment.requireFragmentManager(), JG_DIALOG_DATE)
+            }
+        }
+
+        jgReportButton.setOnClickListener {
+            Intent(Intent.ACTION_SEND).apply {
+                type = "text/plain"
+                putExtra(Intent.EXTRA_TEXT, jgGetCrimeReport())
+                putExtra(
+                        Intent.EXTRA_SUBJECT,
+                        getString(R.string.jg_crime_report_subject))
+            }.also { intent->
+                val jgChooserIntent =
+                        Intent.createChooser(intent,getString(R.string.jg_send_report))
+                startActivity(jgChooserIntent)
             }
         }
     }
@@ -115,6 +148,58 @@ class JGCrimeFragment: Fragment(), JGDatePickerFragment.Callbacks {
             isChecked = jgCrime.isSolved
             jumpDrawablesToCurrentState()
         }
+        if(jgCrime.suspect.isNotEmpty()) {
+            jgSuspectButton.text = jgCrime.suspect
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        when {
+            resultCode != Activity.RESULT_OK -> return
+
+            requestCode == JG_REQUEST_CONTACT && data != null -> {
+                val jgContactUri: Uri? = data.data
+
+                //Specify which fields you want to query to return values for
+                val jgQueryFields = arrayOf(ContactsContract.Contacts.DISPLAY_NAME)
+
+                //Perform your query - the contactUri is like a "where" clause here
+                val jgCursor = requireActivity().contentResolver
+                        .query(jgContactUri, jgQueryFields, null, null, null)
+                jgCursor?.use {
+                    //verify cursor contains ata least on result
+                    if(it.count == 0) {
+                        return
+                    }
+
+                    // Pull out thte first column of the first row of data -
+                    // thjat is your suspect's name
+                    it.moveToFirst()
+                    val jgSuspect = it.getString(0)
+                    jgCrime.suspect = jgSuspect
+                    jgCrimeDetailViewModel.jgSaveCrime(cr)
+
+                }
+            }
+        }
+    }
+    private fun jgGetCrimeReport(): String {
+        val jgSolvedString = if(jgCrime.isSolved) {
+            getString(R.string.jg_crime_report_solved)
+        } else {
+            getString(R.string.jg_crime_report_unsolved)
+        }
+
+        val jgDateString = DateFormat.format(JG_DATE_FORMAT, jgCrime.date).toString()
+        var jgSuspect = if(jgCrime.suspect.isBlank()) {
+            getString(R.string.jg_crime_report_no_suspect)
+        } else {
+            getString(R.string.jg_crime_report_suspect, jgCrime.suspect)
+        }
+
+        return getString(R.string.jg_crime_report,
+                jgCrime.title, jgDateString, jgSolvedString, jgSuspect)
+
     }
 
     companion object {

@@ -1,0 +1,24 @@
+<resources>
+    <string name="app_name">CriminalIntent</string>
+    <string name="jg_crime_title_hint">Enter a title for the crime.</string>
+    <string name="jg_crime_title_label">Title</string>
+    <string name="jg_crime_details_label">Details</string>
+    <string name="jg_crime_solved_label">Solved</string>
+    <string name="jg_crime_photo_button_description">Take photo of crime scene</string>
+    <string name="jg_crime_photo_no_image_description">
+        Crime scene photo (not set)
+    </string>
+    <string name="jg_crime_photo_image_description">Crime scene photo (set)</string>
+    <string name="jg_new_crime">New Crime</string>
+    <string name="jg_crime_suspect_text">Choose Suspect</string>
+    <string name="jg_crime_report_text">Send Crime Report</string>
+    <string name="jg_crime_report">%1$s!
+        The crime was discovered on %2$s. %3$s, and %4$s
+    </string>
+    <string name="jg_crime_report_solved">The case is solved</string>
+    <string name="jg_crime_report_unsolved">The case is not solved</string>
+    <string name="jg_crime_report_no_suspect">there is no suspect.</string>
+    <string name="jg_crime_report_suspect">the suspect is %s.</string>
+    <string name="jg_crime_report_subject">Criminal Intent Crime Report</string>
+    <string name="jg_send_report">Send crime report via</string>
+</resources>

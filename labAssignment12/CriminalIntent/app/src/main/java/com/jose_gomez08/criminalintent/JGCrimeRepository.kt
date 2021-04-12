@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.room.Room
 import com.jose_gomez08.criminalintent.database.JGCrimeDao
 import com.jose_gomez08.criminalintent.database.JGCrimeDatabase
+import com.jose_gomez08.criminalintent.database.jg_migration_1_2
 import java.lang.IllegalStateException
 import java.util.*
 import java.util.concurrent.Executors
@@ -17,7 +18,8 @@ class JGCrimeRepository private constructor(context: Context) {
         context.applicationContext,
         JGCrimeDatabase::class.java,
         JG_DATABASE_NAME
-    ).build()
+    ).addMigrations(jg_migration_1_2)
+             .build()
 
     private val jgCrimeDao = jgDatabase.jgCrimeDao()
     private val jgExecutor = Executors.newSingleThreadExecutor()
